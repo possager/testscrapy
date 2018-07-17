@@ -14,7 +14,8 @@ class TestscrapyPipeline(object):
     def process_item(self, item, spider):
         basic_file='E:/scrapy_data/'
         if platform.system()=='Linux':
-            basic_file='/media/liang/Data/scrapy_data/'
+            # basic_file='/media/liang/Data/scrapy_data/'
+            basic_file='/media/liang/办公/Data/datascrapy/'
         if type(item)==type({}):
             if not os.path.exists(basic_file+spider.name):
                 os.makedirs(basic_file+spider.name)
