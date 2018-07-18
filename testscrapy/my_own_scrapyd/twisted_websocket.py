@@ -1,39 +1,13 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Time    : 2018/7/18 17:27
-# @Author  : LiangLiang
-# @Site    : 
-# @File    : websocket_example_from_remote.py
-# @Software: PyCharm
-
-
-import twisted
-from twisted.internet import reactor, protocol
-from twisted.internet.protocol import Protocol
-from twisted.internet.protocol import Factory
-from twisted.internet.endpoints import TCP4ServerEndpoint
-import hashlib
+from twisted.internet.protocol import Protocol,Factory
 from base64 import b64encode
+import hashlib
 import time
+from twisted.internet.endpoints import TCP4ServerEndpoint
+import json
 
 
-# class Echo(Protocol):
-#     def __init__(self, factory):
-#         self.factory = factory
-#
-#     def connectionMade(self):
-#         self.factory.numProtocols = self.factory.numProtocols + 1
-#         self.transport.write(
-#             b"Welcome! There are currently %d open connections.\n" %
-#             (self.factory.numProtocols,))
-#     def connectionLost(self, reason):
-#         self.factory.numProtocols = self.factory.numProtocols - 1
-#
-#     def dataReceived(self, data):
-#         self.transport.write(data)
 
-
-class QOTD(Protocol):
+class WebSocket(Protocol):
 
 
     def connectionMade(self):
@@ -57,7 +31,7 @@ class QOTD(Protocol):
             # set opcode 1 = text
             frame_head[0] = set_bit(frame_head[0], 0)
             # payload length
-            assert len(data) < 126, "haven't implemented that yet"
+            # assert len(data) < 126, "haven't implemented that yet"
             frame_head[1] = len(data)
             # add data
             frame = frame_head + data.encode('utf-8')
@@ -126,11 +100,16 @@ class QOTD(Protocol):
                     # print('Handshaken with {} success!'.format(self.remote))
 
         data_raw = parse_recv_data(data)
+        print(data_raw)
 
         count1 =0
+        print(self.stas._stats)
+        stats_info = self.stas._stats
+        stats_info['start_time'] = stats_info['start_time'].strftime("%Y-%m-%d %H:%M:%S")
+
         while count1 < 10:
-            time.sleep(0.5)
-            self.transport.write(pack("hello"))
+            jsonstr = json.dumps(stats_info)
+            self.transport.write(pack(jsonstr))
             count1 += 1
 
 
@@ -139,20 +118,20 @@ class QOTD(Protocol):
     def connectionLost(self, reason=None):
         print("closed a connection")
 
+    @property
+    def spider_status(self):
+        return self.spider.__dict__
+
+    def set_stat(self, stat):
+        self.stas = stat
 
 
-class QOTDFactory(Factory):
+
+class websocketFactory(Factory):
     def buildProtocol(self, addr):
-        QOTD1 = QOTD()
-        return QOTD()
+        ws = WebSocket()
+        ws.set_stat(self.stats)
+        return ws
 
-# class EchoFactory(Factory):
-#     def buildProtocol(self, addr):
-#         return Echo(self)
-
-
-endpoint = TCP4ServerEndpoint(reactor, 9998)
-endpoint1 = TCP4ServerEndpoint(reactor, 9999)
-endpoint.listen(QOTDFactory())
-# endpoint1.listen(EchoFactory())
-reactor.run()
+    def add_stats(self, stats):
+        self.stats = stats

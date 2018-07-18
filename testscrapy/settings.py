@@ -22,7 +22,7 @@ NEWSPIDER_MODULE = 'testscrapy.spiders'
 ROBOTSTXT_OBEY = True
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 64
+CONCURRENT_REQUESTS = 1
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -64,9 +64,9 @@ CONCURRENT_REQUESTS = 64
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-ITEM_PIPELINES = {
-   'testscrapy.pipelines.TestscrapyPipeline': 300,
-}
+# ITEM_PIPELINES = {
+#    'testscrapy.pipelines.TestscrapyPipeline': 300,
+# }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
@@ -88,3 +88,6 @@ AUTOTHROTTLE_ENABLED = False
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+
+STATS_CLASS = "testscrapy.stat_self.MemoryStatsCollector"
